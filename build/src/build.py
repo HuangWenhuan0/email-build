@@ -51,9 +51,7 @@ IS_MIUI_BRANCH = 'is-miui-branch'
 DEF_CHANNEL = 'dev'
 DEF_CONFIG  = 'debug'
 DEF_ENABLE_BRANCH_NAME = False
-DEF_VERSION_NAME = 'WpsMail_2014'
 DEF_APK_PREFIX = 'WpsMail'
-DEF_BRANCH_TYPE = 'miui'
 DEF_IS_MIUI_BRANCH = False
 
 OPTIONS = {
@@ -62,7 +60,7 @@ OPTIONS = {
        PACKAGE_NAME       : None,
        DISPLAY_NAME       : None,
        ENABLE_BRANCH_NAME : DEF_ENABLE_BRANCH_NAME,
-       VERSION_NAME       : DEF_VERSION_NAME,
+       VERSION_NAME       : None,
        APK_PREFIX         : DEF_APK_PREFIX,
        BRANCH_NAME        : None,
        IS_MIUI_BRANCH     : DEF_IS_MIUI_BRANCH
@@ -252,7 +250,7 @@ def change_displayname(params):
     pass
     
 def change_packagename(params):
-    package_name = params[PACKAGE_NAME] or DEF_PACKAGE_NAME
+    package_name = params[PACKAGE_NAME]
     if params[ENABLE_BRANCH_NAME]:
         package_name += "_" + BRANCH_NAME
     
@@ -286,7 +284,7 @@ def change_appdebugable(params):
         
 def change_version_name(params):
     ver_name = params[VERSION_NAME]
-    if ver_name:
+    if ver_name != DEF_VERSION_NAME:
         scmd = "sed -i 's#android:versionName=\".*\"#android:versionName=\"%s\"#' AndroidManifest.xml"
         os.system(scmd % ver_name)
 
@@ -297,11 +295,6 @@ def change_appchannel(params):
     for d_channel in default_channels:
         os.system(scmd % (d_channel, channel))
         
-def set_apk_prefix(params):
-    apk_prefix = params[APK_PREFIX]
-    if not apk_prefix:
-        params[APK_PREFIX] = DEF_APK_PREFIX
-    
 def start_ant(params):
     ant_cmd = 'ant clean %s | tee -a ant-build.log'
     if os.system(ant_cmd % params[CONFIG]):
@@ -330,7 +323,6 @@ def set_global_info():
     global DEF_VERSION_NAME
     
     GIT_COMMIT_SHA1 = Parameters.get_git_commit_sha1()
-#     IS_MIUI_BRANCH = Parameters.is_miui_branch()
     DEF_PACKAGE_NAME = Parameters.get_def_pn()
     DEF_VERSION_NAME = Parameters.get_def_version_name()
 
@@ -392,7 +384,6 @@ def main():
     cleanup()
     backup()
     
-    set_apk_prefix(params)
     change_version_name(params)
     change_displayname(params)
     change_packagename(params)
