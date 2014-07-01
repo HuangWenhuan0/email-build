@@ -402,13 +402,13 @@ def main():
     
     cleanup()
     backup()
-    
+
     change_version_name(params)
     change_displayname(params)
     change_packagename(params)
     change_appdebugable(params)
     change_appchannel(params)
-	change_commit_sha1()
+    change_commit_sha1()
     
     prepare(params)
     
