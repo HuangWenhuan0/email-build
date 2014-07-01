@@ -69,6 +69,16 @@ OPTIONS = {
 FORMATTER = '%-20s = %s'
 
 
+class PrintBlankLine(object):
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, *args, **kwargs):
+        print
+        self.func(*args, **kwargs)
+        print
+
+
 class Parameters(object):
     def __init__(self):
         self.option = dict(OPTIONS)
@@ -158,14 +168,14 @@ def usage():
 def __log(level, out):
     print '%s - [%s] : %s' % (level, time.ctime()[4:-5], out)
 
+@PrintBlankLine
 def rename(rootpath, **kwargs):
     for root, dirs, files in os.walk(rootpath):
-        print root, dirs, files
-
         for sf, df in kwargs.items():
             if sf in files:
                 src = os.path.join(root, sf)
                 dst = os.path.join(root, df)
+                print '[%-10s] %s -> %s' % (root, src, dst)
                 shutil.move(src, dst)
 
 def prepare(params):
