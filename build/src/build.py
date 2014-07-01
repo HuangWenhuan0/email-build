@@ -294,6 +294,12 @@ def change_appchannel(params):
     default_channels = ['DEBUG', 'miui', 'wps']
     for d_channel in default_channels:
         os.system(scmd % (d_channel, channel))
+		
+def change_commit_sha1():
+    scmd = "sed -i 'N;s#android:name=\"commit_id\"\s\+android:value=\"%s\"#android:name=\"commit_id\"\\r\\n\\t\\t\\tandroid:value=\"%s\"#' AndroidManifest.xml"
+    default_channels = ['DEBUG']
+    for d_channel in default_channels:
+        os.system(scmd % (d_channel, GIT_COMMIT_SHA1))
         
 def start_ant(params):
     ant_cmd = 'ant clean %s | tee -a ant-build.log'
@@ -389,6 +395,7 @@ def main():
     change_packagename(params)
     change_appdebugable(params)
     change_appchannel(params)
+	change_commit_sha1()
     
     prepare(params)
     
