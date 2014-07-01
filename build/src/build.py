@@ -157,8 +157,17 @@ def usage():
     
 def __log(level, out):
     print '%s - [%s] : %s' % (level, time.ctime()[4:-5], out)
-    
-    
+
+def rename(rootpath, **kwargs):
+    for root, dirs, files in os.walk(rootpath):
+        print root, dirs, files
+
+        for sf, df in kwargs.items():
+            if sf in files:
+                src = os.path.join(root, sf)
+                dst = os.path.join(root, df)
+                shutil.move(src, dst)
+
 def prepare(params):
     # config sdk directory
     filename = 'sdk.properties'
@@ -200,6 +209,10 @@ def prepare(params):
             if not os.path.exists(os.path.join(dst, apk_name)):
                 # shutil.copy2('../miui_libs/%s' % apk_name, dst)
                 shutil.copy2('./%s' % apk_name, dst)
+
+    files = {'ksMailTemplate_mixed.html' : 'ksMailTemplate.html',
+             'ksMailView_mixed.js'       : 'ksMailView.js'}
+    rename('assets', **files);
     
 def backup():
     if not os.path.exists(GIT_COMMIT_SHA1):
