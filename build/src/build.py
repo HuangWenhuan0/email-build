@@ -23,6 +23,8 @@ import time
 
 from StringIO import StringIO
 from subprocess import check_output
+from lxml import etree
+
 
 __PYTHON_VER__ = '2.7.6'
 
@@ -37,6 +39,9 @@ SDK_PATHS = {
         'Linux_miui'    : 'sdk.dir=/opt/android-miui-sdk_r16-linux',
         'Linux_wps'     : 'sdk.dir=/opt/android-sdk_r22.6.2-linux'
     }
+
+ANDROID_MANIFEST = 'AndroidManifest.xml'
+NAMESPACES = {'android' : 'http://schemas.android.com/apk/res/android'}
 
 CHANNEL = 'channel'
 CONFIG = 'config'
@@ -311,18 +316,46 @@ def change_version_name(params):
         scmd = "sed -i 's#android:versionName=\".*\"#android:versionName=\"%s\"#' AndroidManifest.xml"
         os.system(scmd % ver_name)
 
-def change_appchannel(params):
-    channel = params[CHANNEL]
-    scmd = "sed -i 'N;s#android:name=\"channel\"\s\+android:value=\"%s\"#android:name=\"channel\"\\r\\n\\t\\t\\tandroid:value=\"%s\"#' AndroidManifest.xml"
-    default_channels = ['DEBUG', 'miui', 'wps']
-    for d_channel in default_channels:
-        os.system(scmd % (d_channel, channel))
-		
-def change_commit_sha1():
-    scmd = "sed -i 'N;s#android:name=\"commit_id\"\s\+android:value=\"%s\"#android:name=\"commit_id\"\\r\\n\\t\\t\\tandroid:value=\"%s\"#' AndroidManifest.xml"
-    default_channels = ['DEBUG']
-    for d_channel in default_channels:
-        os.system(scmd % (d_channel, GIT_COMMIT_SHA1))
+# def change_appchannel(params):
+#     channel = params[CHANNEL]
+#     scmd = "sed -i 'N;s#android:name=\"channel\"\s\+android:value=\"%s\"#android:name=\"channel\"\\r\\n\\t\\t\\tandroid:value=\"%s\"#' AndroidManifest.xml"
+#     default_channels = ['DEBUG', 'miui', 'wps']
+#     for d_channel in default_channels:
+#         os.system(scmd % (d_channel, channel))
+
+def change_appchannel_2(params):
+    doc = etree.parse(ANDROID_MANIFEST)
+    md_nodes = doc.xpath('//manifest/application/meta-data[@android:name="channel"]',
+                        namespaces=NAMESPACES)
+    dirty = False
+    for node in md_nodes:
+        for key, value in node.items():
+            if key == '{http://schemas.android.com/apk/res/android}value' and value != params[CHANNEL]:
+                node.set(key, params[CHANNEL])
+                dirty = True
+
+    if dirty:
+        doc.write(ANDROID_MANIFEST, encoding='utf-8')
+
+# def change_commit_sha1():
+#     scmd = "sed -i 'N;s#android:name=\"commit_id\"\s\+android:value=\"%s\"#android:name=\"commit_id\"\\r\\n\\t\\t\\tandroid:value=\"%s\"#' AndroidManifest.xml"
+#     default_channels = ['DEBUG']
+#     for d_channel in default_channels:
+#         os.system(scmd % (d_channel, GIT_COMMIT_SHA1))
+
+def change_commit_sha1_2():
+    doc = etree.parse(ANDROID_MANIFEST)
+    md_nodes = doc.xpath('//manifest/application/meta-data[@android:name="commit_id"]',
+                        namespaces=NAMESPACES)
+    dirty = False
+    for node in md_nodes:
+        for key, value in node.items():
+            if key == '{http://schemas.android.com/apk/res/android}value':
+                node.set(key, GIT_COMMIT_SHA1)
+                dirty = True
+
+    if dirty:
+        doc.write(ANDROID_MANIFEST, encoding='utf-8')
         
 def start_ant(params):
     ant_cmd = 'ant clean %s | tee -a ant-build.log'
@@ -417,8 +450,8 @@ def main():
     change_displayname(params)
     change_packagename(params)
     change_appdebugable(params)
-    change_appchannel(params)
-    change_commit_sha1()
+    change_appchannel_2(params)
+    change_commit_sha1_2()
     
     prepare(params)
     
