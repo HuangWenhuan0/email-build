@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 process build option
 """
@@ -653,8 +655,6 @@ def _download_build_conf(options):
     os.system('unzip -o -q build.zip')
 
 if __name__ == '__main__':
-    os.chdir(r'F:\soft\Mail-Source\Email\AndroidMail')
-
     manifest = AndroidManifest()
     options = _parse_args(manifest)
 
