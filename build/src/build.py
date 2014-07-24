@@ -31,6 +31,8 @@ try:
 except ImportError:
     from StringIO import StringIO
 
+reload(sys).setdefaultencoding('utf-8')
+
 sdk_cfg            = 'sdk.cfg'
 sdk_props_filename = 'sdk.properties'
 res_filename       = 'framework-miui-res.apk'
@@ -153,13 +155,11 @@ def print_context(prompt=None, out=None):
 
     try:
         if prompt is not None:
-            print '%s %s %s' % ('< |-- ', 'START', prompt)
+            print '%s' % (prompt)
         _()
         yield
     finally:
         _()
-        if prompt is not None:
-            print '%s %s %s' % ('END', prompt, '--| >')
 
 @contextlib.contextmanager
 def cd_path_context(_path):
@@ -616,14 +616,18 @@ def _parse_args(androidmanifest):
         help='overwrite mi_res_apk')
 
     options, args = parser.parse_args()
+
+    options.mode = options.debuggable and 'debug' or 'release'
     options.commit_id = get_git_commit_sha1()
-
-    if options.debuggable:
-        options.mode = 'debug'
-    else:
-        options.mode = 'release'
-
     options.is_mi_branch = SdkSetup.is_mi_branch(options.branch_name)
+
+    for key, value in options.__dict__.items():
+        if type(value) is str and not isinstance(value, unicode):
+            try:
+                setattr(options, key, unicode(value, 'gb2312'))
+            except UnicodeDecodeError as e:
+                print '%-20s = %-10s, %s' % (key, value, type(value))
+
     return options
 
 def _download_build_conf(options):
@@ -655,17 +659,21 @@ def _download_build_conf(options):
     os.system('unzip -o -q build.zip')
 
 if __name__ == '__main__':
+    # os.chdir(r'F:\soft\Mail-Source\Email\AndroidMail')
     manifest = AndroidManifest()
     options = _parse_args(manifest)
 
     _download_build_conf(options)
 
-    with print_context('original property'):
+    with print_context('[Original AndroidManifest Property]'):
         print manifest
 
     with build_context(options):
         if ant(options.mode):
             publish(options)
 
-            with print_context('final property'):
+            with print_context('[Final AndroidManifest Property]'):
                 print AndroidManifest()
+
+            with print_context('[Final Options]'):
+                log(options)
