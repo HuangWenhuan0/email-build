@@ -37,11 +37,8 @@ sdk_cfg            = 'sdk.cfg'
 sdk_props_filename = 'sdk.properties'
 res_filename       = 'framework-miui-res.apk'
 res_dir            = 'MIUI_SDK'
-res_relative_path  = os.path.join(os.path.join(os.path.curdir, res_dir), res_filename)
+res_relative_path  = os.path.join(os.path.curdir, res_dir, res_filename)
 project_filename   = 'project.properties'
-
-DEFAULT_URL     = 'http://192.168.134.99/build-conf2/'
-DEFAULT_APK_URL = DEFAULT_URL + res_filename
 
 ANDROID_MANIFEST_XML = 'AndroidManifest.xml'
 NAMESPACES           = {'android' : 'http://schemas.android.com/apk/res/android'}
@@ -283,7 +280,7 @@ def build_context(options):
 
     def mk_sdk():
         ismi = SdkSetup.is_mi_branch(options.branch_name)
-        SdkSetup.mk_sdk(ismi, overwrite=options.overwrite, verbose=options.verbose)
+        SdkSetup.mk_sdk(ismi, conf=options.build_conf, overwrite=options.overwrite, verbose=options.verbose)
 
     try:
         cleanup()
@@ -300,31 +297,53 @@ def build_context(options):
 
 class SdkSetup(object):
 
-    @staticmethod
-    def mk_sdk(ismi=False, overwrite=False, verbose=False):
-        with open(sdk_cfg) as cfg:
-            props = Properties()
-            props.load(cfg)
+    # @staticmethod
+    # def mk_sdk(ismi=False, overwrite=False, verbose=False):
+    #     with open(sdk_cfg) as cfg:
+    #         props = Properties()
+    #         props.load(cfg)
+    #
+    #     with open(sdk_props_filename, 'w+') as fsock:
+    #         osname = platform.system()
+    #
+    #         if ismi:
+    #             key = '%s_mi' % osname
+    #         else:
+    #             key = osname
+    #
+    #         value = props[key]
+    #
+    #         if ismi and value is not '':
+    #             SdkSetup.cp_miui_res(overwrite, verbose)
+    #
+    #         if value is not '':
+    #             fsock.write('sdk.dir=%s' % value)
+    #             return 0
+    #         else:
+    #             print "# current platform %s doesn't supported!" % platform.system()
+    #             return 1
 
+    LAN_CONF = {'Windows': 'E:/android/sdk/android-sdk_r22.6.2-windows',
+                'Windows_mi': 'E:/android/sdk/android-miui-sdk_r22.6.2-windows',
+                'Linux': '/opt/android-sdk_r22.6.2-linux',
+                'Linux_mi': '/opt/android-miui-sdk_r16-linux',
+                'url': 'http://192.168.134.99/build-conf2/'}
+
+    WAN_CONF = {'Windows': 'E:/android/sdk/android-sdk_r22.6.2-windows',
+                'Windows_mi': 'E:/android/sdk/android-miui-sdk_r22.6.2-windows',
+                'Linux': '/data/hudson/android-sdk_r22.6.2-linux',
+                'Linux_mi': '/data/hudson/android-miui-sdk_r16-linux',
+                'url': 'http://42.62.42.75:51866/build-conf2/'}
+
+    URL = LAN_CONF['url']
+
+    @staticmethod
+    def mk_sdk(ismi=False, conf=LAN_CONF, overwrite=False, verbose=False):
         with open(sdk_props_filename, 'w+') as fsock:
             osname = platform.system()
-
-            if ismi:
-                key = '%s_mi' % osname
-            else:
-                key = osname
-
-            value = props[key]
-
-            if ismi and value is not '':
-                SdkSetup.cp_miui_res(overwrite, verbose)
-
-            if value is not '':
-                fsock.write('sdk.dir=%s' % value)
-                return 0
-            else:
-                print "# current platform %s doesn't supported!" % platform.system()
-                return 1
+            key = ismi and ('%s_mi' % osname) or (osname)
+            SdkSetup.cp_miui_res(overwrite, verbose)
+            fsock.write('sdk.dir=%s' % conf[key])
 
     @staticmethod
     def get_dependency_projects():
@@ -365,7 +384,7 @@ class SdkSetup(object):
                 if __is_android_project():
                     if verbose: print '# download %s to %s' % (res_filename, _join(os.getcwd(), res_dir))
                     from build import get_best_downloader as _down
-                    _down()(DEFAULT_APK_URL, res_relative_path)
+                    _down()(SdkSetup.URL + res_filename, res_relative_path)
                 else:
                     print '# current directory is not android project'
                     sys.exit(2)
@@ -609,6 +628,9 @@ def _parse_args(androidmanifest):
         metavar='BRANCH-NAME',
         help='specify branch name (not null)')
     parser.add_option(
+        '--wan', dest='iswan', action='store_true', default=False,
+        help='download build configuration form wan, else form lan')
+    parser.add_option(
         '-q', '--quiet', dest='verbose', action='store_false', default=True,
         help="don't print log information")
     parser.add_option(
@@ -618,8 +640,11 @@ def _parse_args(androidmanifest):
     options, args = parser.parse_args()
 
     options.mode = options.debuggable and 'debug' or 'release'
+    options.build_conf = options.iswan and SdkSetup.WAN_CONF or SdkSetup.LAN_CONF
     options.commit_id = get_git_commit_sha1()
     options.is_mi_branch = SdkSetup.is_mi_branch(options.branch_name)
+
+    SdkSetup.URL = options.build_conf['url']
 
     for key, value in options.__dict__.items():
         if type(value) is str and not isinstance(value, unicode):
@@ -649,9 +674,9 @@ def _download_build_conf(options):
         else:
             return 'ant/%s/build.zip' % 'com.kingsoft.email'
 
-    files = {DEFAULT_URL + 'build.xml': 'build.xml',
-             DEFAULT_URL + 'sdk.cfg'  : 'sdk.cfg',
-             DEFAULT_URL + build_common_xml_path() : 'build.zip'}
+    url = SdkSetup.URL
+    files = {url + 'build.xml': 'build.xml',
+             url + build_common_xml_path() : 'build.zip'}
 
     for url, target in files.items():
         get(url, target)
@@ -659,7 +684,7 @@ def _download_build_conf(options):
     os.system('unzip -o -q build.zip')
 
 if __name__ == '__main__':
-    # os.chdir(r'F:\soft\Mail-Source\Email\AndroidMail')
+    os.chdir(r'F:\soft\Mail-Source\Email\AndroidMail')
     manifest = AndroidManifest()
     options = _parse_args(manifest)
 
