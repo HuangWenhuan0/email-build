@@ -578,7 +578,7 @@ class AndroidManifest(object):
 
     def save(self):
         if self.dirty:
-            self.doc.write(ANDROID_MANIFEST_XML, encoding='utf-8')
+            self.doc.write(ANDROID_MANIFEST_XML, xml_declaration=False, encoding='utf-8')
 
     def __str__(self):
         return self.tostring()
