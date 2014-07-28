@@ -679,7 +679,7 @@ def _download_build_conf(options):
 
     os.system('unzip -o -q build.zip')
 
-if __name__ == '__main__':
+def main():
     manifest = AndroidManifest()
     options = _parse_args(manifest)
 
@@ -697,3 +697,6 @@ if __name__ == '__main__':
 
             with print_context('[Final Options]'):
                 log(options)
+
+if __name__ == '__main__':
+    main()
