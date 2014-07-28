@@ -1,4 +1,4 @@
-# coding:utf-8e
+# coding:utf-8
 
 import os
 import build
