@@ -247,7 +247,7 @@ def cleanup(all=False):
         for dir in tmp_dirs:
             if _exists(dir): shutil.rmtree(dir)
 
-def backup():
+def backup(options):
     if not os.path.exists(options.commit_id):
         os.mkdir(options.commit_id)
 
@@ -284,7 +284,7 @@ def build_context(options):
 
     try:
         cleanup()
-        backup()
+        backup(options)
 
         mk_sdk()
         modify_project_code()
@@ -326,16 +326,14 @@ class SdkSetup(object):
     LAN_CONF = {'Windows': 'E:/android/sdk/android-sdk_r22.6.2-windows',
                 'Windows_mi': 'E:/android/sdk/android-miui-sdk_r22.6.2-windows',
                 'Linux': '/opt/android-sdk_r22.6.2-linux',
-                'Linux_mi': '/opt/android-miui-sdk_r16-linux',
-                'url': 'http://192.168.134.99/build-conf2/'}
+                'Linux_mi': '/opt/android-miui-sdk_r16-linux'}
 
     WAN_CONF = {'Windows': 'E:/android/sdk/android-sdk_r22.6.2-windows',
                 'Windows_mi': 'E:/android/sdk/android-miui-sdk_r22.6.2-windows',
                 'Linux': '/data/hudson/android-sdk_r22.6.2-linux',
-                'Linux_mi': '/data/hudson/android-miui-sdk_r16-linux',
-                'url': 'http://42.62.42.75:51866/build-conf2/'}
+                'Linux_mi': '/data/hudson/android-miui-sdk_r16-linux'}
 
-    URL = LAN_CONF['url']
+    URL = 'http://42.62.42.75:51866/build-conf2/'
 
     @staticmethod
     def mk_sdk(ismi=False, conf=LAN_CONF, overwrite=False, verbose=False):
@@ -643,8 +641,6 @@ def _parse_args(androidmanifest):
     options.build_conf = options.iswan and SdkSetup.WAN_CONF or SdkSetup.LAN_CONF
     options.commit_id = get_git_commit_sha1()
     options.is_mi_branch = SdkSetup.is_mi_branch(options.branch_name)
-
-    SdkSetup.URL = options.build_conf['url']
 
     for key, value in options.__dict__.items():
         if type(value) is str and not isinstance(value, unicode):
