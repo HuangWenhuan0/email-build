@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
-
-"""
-process build option
-"""
+# coding: utf-8
 
 import sys
 import os
@@ -179,7 +175,7 @@ def hash(_file, _type='md5'):
         for line in fsock:
             f.update(line)
 
-    return f.name, f.hexdigest()
+    return f.name.lower(), f.hexdigest()
 
 def get_git_commit_sha1():
     try:
