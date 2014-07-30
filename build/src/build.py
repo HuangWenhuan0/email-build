@@ -623,7 +623,7 @@ def _parse_args(androidmanifest):
         help='specify branch name (not null)')
     parser.add_option(
         '--wan', dest='iswan', action='store_true', default=False,
-        help='download build configuration form wan, else form lan')
+        help='download build configuration from wan, else from lan')
     parser.add_option(
         '-q', '--quiet', dest='verbose', action='store_false', default=True,
         help="don't print log information")
@@ -632,6 +632,10 @@ def _parse_args(androidmanifest):
         help='overwrite mi_res_apk')
 
     options, args = parser.parse_args()
+
+    if options.branch_name is None:
+        parser.print_help()
+        sys.exit(2)
 
     options.mode = options.debuggable and 'debug' or 'release'
     options.build_conf = options.iswan and SdkSetup.WAN_CONF or SdkSetup.LAN_CONF
