@@ -633,6 +633,10 @@ def _parse_args(androidmanifest):
 
     options, args = parser.parse_args()
 
+    if options.branch_name is None:
+        parser.print_help()
+        sys.exit(2)
+
     options.mode = options.debuggable and 'debug' or 'release'
     options.build_conf = options.iswan and SdkSetup.WAN_CONF or SdkSetup.LAN_CONF
     options.commit_id = get_git_commit_sha1()
