@@ -8,7 +8,8 @@ from zipfile import ZIP_DEFLATED
 
 def __addToZip(zf, path, zippath):
     if os.path.isfile(path):
-        zf.write(path, zippath, ZIP_DEFLATED)
+        if not path.endswith(".pyc"):
+            zf.write(path, zippath, ZIP_DEFLATED)
     elif os.path.isdir(path):
         for nm in os.listdir(path):
             __addToZip(zf, os.path.join(path, nm), os.path.join(zippath, nm))
