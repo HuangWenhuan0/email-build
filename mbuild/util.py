@@ -147,7 +147,9 @@ def cp_miui_res(_url=url):
             shutil.copy2(apk_path, dst_dir)
 
 def rm_miui_res():
-    shutil.rmtree(miui_res_dir)
+    if _exists(miui_res_dir):
+        shutil.rmtree(miui_res_dir)
+
     for dir in get_dependency_projects():
         dst_dir = _join(dir, miui_res_dir)
         if _exists(dst_dir):
