@@ -99,7 +99,10 @@ class Build(object):
         if not os.path.exists(publish_dir):
             os.makedirs(publish_dir)
 
-        apk_name = '%s_%s_%s_%s.apk' % (options.apk_prefix, options.channel, options.version_name, options.commit_id[:7])
+        if not self.ismi:
+            apk_name = '%s_%s_%s_%s.apk' % (options.apk_prefix, options.channel, options.version_name, options.commit_id[:7])
+        else:
+            apk_name = '%s_%s_%s.apk' % (options.apk_prefix, options.channel, options.commit_id[:7])
         src_apk = self._get_original_apk_path()
         dst_apk = '%s/%s' % (publish_dir, apk_name)
 
@@ -203,7 +206,7 @@ class Build(object):
 
         shutil.rmtree(self.commit_id)
 
-        if self.ismi:
+        if is_mi_v5(self.branch_name):
             rm_miui_res()
 
     def revise_file(self, manifest):

@@ -55,6 +55,7 @@ class Command(object):
 
     def main(self, args):
         options, args = self.parse_args(args)
+        self.__convert(options)
 
         exit = SUCCESS
         try:
@@ -65,6 +66,14 @@ class Command(object):
             e = sys.exc_info()[1]
             exit = ERROR
         return exit
+
+    def __convert(self, options):
+        for key, value in options.__dict__.items():
+            if type(value) is str and not isinstance(value, unicode):
+                try:
+                    setattr(options, key, unicode(value, 'gb2312'))
+                except UnicodeDecodeError as e:
+                    print '%-20s = %-10s, %s' % (key, value, type(value))
 
 
 class AndBuildCommand(Command):
@@ -82,7 +91,6 @@ class AndBuildCommand(Command):
 
     def run(self, options, args):
         options.commit_id = get_git_commit_sha1()
-        options.mode = 'debug' if options.debug else 'release'
         ant_build = AntBuild(options, options.verbose)
         with ant_build.prepare(AndroidManifest()):
             if ant_build.build():
@@ -103,7 +111,6 @@ class GradleCommand(Command):
 
     def run(self, options, args):
         options.commit_id = get_git_commit_sha1()
-        options.mode = 'debug' if options.debug else 'release'
         gradle_build = GradleBuild(options, options.verbose)
         with gradle_build.prepare(AndroidManifest()):
             if gradle_build.build():
