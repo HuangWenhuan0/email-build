@@ -226,7 +226,8 @@ def publish(options):
             log(options, build_log)
 
     os.system('rm -fr bin/classes bin/*_ bin/*.d bin/*.apk')
-    os.system('tar zcf %s/src.tar.gz src gen bin/*' % publish_dir)
+    if not options.iswan:
+        os.system('tar zcf %s/src.tar.gz src gen bin/*' % publish_dir)
 
 def log(options, stdout=sys.stdout):
     format = '%-20s = %s'
