@@ -11,16 +11,6 @@ def make_option_group(group, parser):
         option_group.add_option(option)
     return option_group
 
-# class optparse.Option(object):
-#     def __init__(self, *args, **kwargs):
-#         self.args = args
-#         self.kwargs = kwargs
-#
-#     def make(self):
-#         import copy
-#         args_copy = copy.deepcopy(self.args)
-#         kwargs_copy = copy.deepcopy(self.kwargs)
-#         return optparse.Option(args_copy, kwargs_copy)
 
 help = optparse.Option(
     '-h', '--help',
@@ -121,11 +111,11 @@ db_version_code = optparse.Option(
 )
 
 branch_name = optparse.Option(
-        '--branch-name',
-        dest='branch_name',
-        default=None,
-        metavar='branchname',
-        help='specify branch name (not null)')
+    '--branch-name',
+    dest='branch_name',
+    default=None,
+    metavar='branchname',
+    help='specify branch name (not null)')
 
 apk_prefix = optparse.Option(
     '--apk-prefix',

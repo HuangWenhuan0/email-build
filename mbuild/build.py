@@ -1,11 +1,8 @@
-#!/usr/bin/env python
 # coding: utf-8
 #
 # author:
 #   HuangWenhuan    <huangwenhuan1125@gmail.com>
 #
-
-__version__ = '2.1'
 
 import os
 import sys
@@ -16,8 +13,6 @@ import logging
 import re
 import base64
 import hashlib
-
-# from mbuild import ANTFILE
 
 from mbuild.util import is_mi_branch
 from mbuild.util import rename
@@ -335,43 +330,6 @@ class AntBuild(Build):
         return 'bin/AndroidMail-%s.apk' % self.mode
 
 
-    # def publish(self):
-    #     options = self.options
-    #
-    #     publish_dir = '%s/%s/%s' % (options.mode, options.channel, options.commit_id)
-    #     if not os.path.exists(publish_dir):
-    #         os.makedirs(publish_dir)
-    #
-    #     apk_name = '%s_%s_%s_%s.apk' % (options.apk_prefix, options.channel, options.version_name, options.commit_id[:7])
-    #     src_apk = 'bin/AndroidMail-%s.apk' % self.mode
-    #     dst_apk = '%s/%s' % (publish_dir, apk_name)
-    #
-    #     shutil.copy2(src_apk, dst_apk)
-    #     shutil.copy2('ant-build.log', publish_dir)
-    #     shutil.copy2(ANDROID_MANIFEST_XML, publish_dir)
-    #
-    #     with cd_path_context(publish_dir):
-    #         # make hash algorithms for apk
-    #         checksum_name = '%s.%s' % (apk_name, 'checksum')
-    #         with open(checksum_name, 'w+') as checksum_fobj:
-    #             # algorithms_list = ('md5', 'sha1')
-    #             for type, value in batch_hash(apk_name, *self.hash_algorithms):
-    #                 setattr(self.options, type, value)
-    #                 checksum_fobj.writelines('*%-7s %s\n' % (type, value))
-    #
-    #         # write options to file
-    #         with open('build.log', 'w') as build_log_fobj:
-    #             from mbuild.util import log
-    #             log(self.options, build_log_fobj)
-    #
-    #     # make src compress file
-    #     if os.getenv('publish_src'):
-    #         archive_name = '%s/src.tar.bz2' % os.path.curdir
-    #         exclude = lambda name: self.SRC_PATTERN.match(name)
-    #         with tarfile.open(archive_name, mode='w|bz2') as tar:
-    #             for dir in self.SRC_DIRS:
-    #                 tar.add(dir, exclude=exclude)
-
 class GradleBuild(Build):
 
     BUILD_CONF = 'build.gradle'
@@ -392,7 +350,3 @@ class GradleBuild(Build):
         for root, dirs, files in os.walk('build'):
             if src_apk_name in files:
                 return os.path.join(root, src_apk_name)
-
-
-
-

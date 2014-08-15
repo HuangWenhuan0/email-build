@@ -96,7 +96,7 @@ utcFX/F3JFOFCQ+o2cWw
 
 """
 
-__version__ = '2.1'
+__version__ = '3.0'
 
 __all__ = ['main']
 
