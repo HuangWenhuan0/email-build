@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <path id="mo.anttasks">
+        <pathelement path="${basedir}/mo-ant-tasks.jar" />
+    </path>
+    
+    <taskdef name="stringreplace"
+            classname="cn.wps.ant.StringReplaceTask"
+            classpathref="mo.anttasks" />
+    
+    <!-- Change package name of R -->
+    <target name="-pre-compile">
+        <!-- Name of the application package extracted from manifest file -->
+        <xpath input="AndroidManifest.xml" expression="/manifest/@package" output="manifest.package" />
+        <stringreplace str="${manifest.package}" target="." replacement="/" property="manifest.package.path" />
+        <move file="gen/${manifest.package.path}/R.java" tofile="gen/com/kingsoft/email/R.java"/>
+        <replaceregexp file="gen/com/kingsoft/email/R.java"
+            match="package ${manifest.package};"
+            replace="package com.kingsoft.email;"
+            byline="true" />
+    </target>
+</project>
