@@ -46,6 +46,16 @@ class Build(object):
     WPS_PACKAGE_NAME = 'com.kingsoft.email'
     MI_PACKAGE_NAME  = 'com.android.email'
 
+    APK_NAME_FORMAT = {
+        '%prefix':          'apk_prefix',
+        '%channel':         'channel',
+        '%versionName':     'version_name',
+        '%versionCode':     'version_code',
+        '%commitId':        'commit_id',
+        '%dbVersoinCode':   'db_version_code',
+        '%packageName':     'package_name'
+        }
+
     def __init__(self, options, verbose=False, ismi=is_mi_branch):
         self.backup_file = None
         self.cmd_line_build_file = None
@@ -99,10 +109,8 @@ class Build(object):
         if not os.path.exists(publish_dir):
             os.makedirs(publish_dir)
 
-        if not self.ismi:
-            apk_name = '%s_%s_%s_%s.apk' % (options.apk_prefix, options.channel, options.version_name, options.commit_id[:7])
-        else:
-            apk_name = '%s_%s_%s.apk' % (options.apk_prefix, options.channel, options.commit_id[:7])
+
+        apk_name = self._expand_apk_name(options.apk_name_format)
         src_apk = self._get_original_apk_path()
         dst_apk = '%s/%s' % (publish_dir, apk_name)
 
@@ -244,6 +252,12 @@ class Build(object):
         # configure sdk directory
         key = None
         try:
+            # remove 'sdk.properties' file
+            sdk_prop_file = 'sdk.properties'
+            if os.path.exists(sdk_prop_file):
+                os.remove(sdk_prop_file)
+
+            # set 'ANDROID_HOME' environment variable
             if is_mi_v5(self.branch_name):
                 key = 'MI_V5_SDK'
             elif is_mi_v6(self.branch_name):
@@ -258,6 +272,23 @@ class Build(object):
         # configure miui resource apk
         if is_mi_v5(self.branch_name):
             cp_miui_res(self.download_url)
+
+    def _expand_apk_name(self, format):
+        import copy
+        apk_name = copy.deepcopy(format)
+
+        for format, attr_name in self.APK_NAME_FORMAT.items():
+            value = None
+            try:
+                value = getattr(self.options, attr_name)
+                if format.lower() == '%commitId'.lower():
+                    value = value[:7]
+            except:
+                value = format
+
+            apk_name = apk_name.replace(format, value)
+
+        return apk_name if apk_name.endswith('.apk') else apk_name + '.apk'
 
     def _log_time(self, prompt):
         import time

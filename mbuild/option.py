@@ -126,11 +126,32 @@ apk_prefix = optparse.Option(
     help='specify apk prefix name (default is %default).'
 )
 
+apk_name_format = optparse.Option(
+    '--apk-name-format',
+    dest='apk_name_format',
+    type='str',
+    default='%prefix_%channel_%versionName_%commitId',
+    metavar='apk name format',
+    help="""specify apk prefix name (default is %default)
+            --apk-name-format option controls the apk name.
+
+            The only valid option is:
+
+                %prefix         apk-prefix
+                %channel        app channel
+                %versionName    app version name
+                %versionCode    app version code
+                %commitId       git commit sha1
+                %dbVersoinCode  app dbversionCode
+                %packageName    app package name
+    """
+)
+
 hash_types = optparse.Option(
     '--hash-types',
     dest='hash_types',
     type='str',
-    default='md5, sha1',
+    default='md5,sha1',
     metavar='hash algorithms',
     help='apk hash algorithms list (default "%default")'
 )
@@ -158,6 +179,7 @@ build_group = {
         version_code,
         db_version_code,
         apk_prefix,
-        hash_types
+        hash_types,
+        apk_name_format
         ]
     }
