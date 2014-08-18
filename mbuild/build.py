@@ -135,9 +135,9 @@ class Build(object):
 
         # make src compress file
         if os.getenv('publish_src'):
-            archive_name = '%s/src.tar.bz2' % os.path.curdir
+            archive_name = '%s/src.tar.gz' % os.path.curdir
             exclude = lambda name: self.SRC_PATTERN.match(name)
-            with tarfile.open(archive_name, mode='w|bz2') as tar:
+            with tarfile.open(archive_name, mode='w|gz') as tar:
                 for dir in self.SRC_DIRS:
                     tar.add(dir, exclude=exclude)
 
@@ -164,7 +164,7 @@ class Build(object):
         dirs = self._BACKUP_DIRS
         files_suffix = self._BACKUP_FILES
 
-        tar = tarfile.open('%s/backup.tar.bz2' % self.commit_id, mode='w|bz2')
+        tar = tarfile.open('%s/backup.tar.gz' % self.commit_id, mode='w|gz')
         try:
             for name in os.listdir(os.path.curdir):
                 if os.path.isdir(name):
@@ -182,7 +182,7 @@ class Build(object):
         finally:
             tar.close()
 
-        self.backup_file = os.path.abspath('%s/backup.tar.bz2' % self.commit_id)
+        self.backup_file = os.path.abspath('%s/backup.tar.gz' % self.commit_id)
 
     def restore(self):
         """
@@ -206,7 +206,7 @@ class Build(object):
                         os.remove(name)
 
         #restore
-        tar = tarfile.open(self.backup_file, mode='r|bz2')
+        tar = tarfile.open(self.backup_file, mode='r|gz')
         try:
             tar.extractall(os.path.curdir)
         finally:
@@ -319,7 +319,7 @@ class AntBuild(Build):
     BUILD_CONF = 'build.xml'
     TEMP_FILES = ('ant-build.log', 'build.log', 'build.zip')
     TEMP_DIRS  = ('build', 'MIUI_SDK')
-    ANT_FILE_NAME = 'ant.tar.bz2'
+    ANT_FILE_NAME = 'ant.tar.gz'
 
     def __init__(self, options, verbose=False, ismi=is_mi_branch):
         super(AntBuild, self).__init__(options, verbose, ismi)
@@ -335,7 +335,7 @@ class AntBuild(Build):
 
         self.build_temp_files.append(self.ANT_FILE_NAME)
 
-        with tarfile.open(self.ANT_FILE_NAME, mode='r:bz2') as tar:
+        with tarfile.open(self.ANT_FILE_NAME, mode='r:gz') as tar:
             for member in tar.getmembers():
                 if member.isfile():
                     path, name = os.path.dirname(member.name), os.path.basename(member.name)
