@@ -147,6 +147,13 @@ apk_name_format = optparse.Option(
     """
 )
 
+batch_channel = optparse.Option(
+    '-C', '--batch-channel',
+    dest='batch_channel',
+    default='c,3,1-70',
+    help='use specified channel (default is %default).'
+)
+
 hash_types = optparse.Option(
     '--hash-types',
     dest='hash_types',
@@ -183,3 +190,21 @@ build_group = {
         apk_name_format
         ]
     }
+
+batch_build_group = {
+    'name': 'Batch Build Options',
+    'options': [
+        debug,
+        batch_channel,
+        package_name,
+        branch_name,
+        enable_branch_name,
+        apk_display_name,
+        version_name,
+        version_code,
+        db_version_code,
+        apk_prefix,
+        hash_types,
+        apk_name_format
+        ]
+}

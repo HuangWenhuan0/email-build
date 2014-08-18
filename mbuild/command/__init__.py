@@ -2,6 +2,7 @@
 
 import os
 import sys
+import copy
 import optparse
 
 from mbuild import option
@@ -75,8 +76,36 @@ class Command(object):
                 except UnicodeDecodeError as e:
                     print '%-20s = %-10s, %s' % (key, value, type(value))
 
+class BatchCommand(Command):
 
-class AndBuildCommand(Command):
+    def __init__(self, *args, **kwargs):
+        super(BatchCommand, self).__init__()
+
+        build_opts = option.make_option_group(option.batch_build_group, self.parser)
+        self.parser.option_groups.insert(0, build_opts)
+
+    def run(self, options, args):
+        options.commit_id = get_git_commit_sha1()
+        options.mode = 'debug' if options.debug else 'release'
+
+        batch_channel = options.batch_channel
+        del options.batch_channel
+
+        channels = batch_channel.split(',')
+        c_prefix, c_len, c_range = channels[0], channels[1], channels[2]
+        start, end = int(c_range.split('-')[0]), int(c_range.split('-')[1])
+        for index in xrange(start, end + 1):
+            tmp_options = copy.deepcopy(options)
+            tmp_options.channel = (c_prefix + '%0' + c_len + 'd') % index
+            self._run_single(tmp_options, args)
+
+
+    def _run_single(self, options, args):
+        pass
+
+
+
+class AntCommand(Command):
     name = 'ant'
     usage = """
         %prog [optoions]
@@ -84,7 +113,7 @@ class AndBuildCommand(Command):
     summary = 'Ant Build Android Project'
 
     def __init__(self, *args, **kwargs):
-        super(AndBuildCommand, self).__init__(*args, **kwargs)
+        super(AntCommand, self).__init__()
 
         build_opts = option.make_option_group(option.build_group, self.parser)
         self.parser.option_groups.insert(0, build_opts)
@@ -92,10 +121,28 @@ class AndBuildCommand(Command):
     def run(self, options, args):
         options.commit_id = get_git_commit_sha1()
         options.mode = 'debug' if options.debug else 'release'
+
         ant_build = AntBuild(options, options.verbose)
         with ant_build.prepare(AndroidManifest()):
             if ant_build.build():
                 ant_build.publish()
+
+class AntBatchCommand(BatchCommand):
+    name = 'ant-batch'
+    usage = """
+        %prog [optoions]
+    """
+    summary = 'Ant Batch Build Android Project'
+
+    def __init__(self, *args, **kwargs):
+        super(AntBatchCommand, self).__init__()
+
+    def _run_single(self, options, args):
+        ant_build = AntBuild(options, options.verbose)
+        with ant_build.prepare(AndroidManifest()):
+            if ant_build.build():
+                ant_build.publish()
+
 
 class GradleCommand(Command):
     name = 'gradle'
@@ -113,6 +160,26 @@ class GradleCommand(Command):
     def run(self, options, args):
         options.commit_id = get_git_commit_sha1()
         options.mode = 'debug' if options.debug else 'release'
+
+        gradle_build = GradleBuild(options, options.verbose)
+        with gradle_build.prepare(AndroidManifest()):
+            if gradle_build.build():
+                gradle_build.publish()
+
+class GradleBatchCommand(BatchCommand):
+    name = 'gradle-batch'
+    usage = """
+        %prog [options]
+    """
+    summary = 'Gradle Batch Build Android Project'
+
+    def __init__(self):
+        super(GradleBatchCommand, self).__init__()
+
+        build_opts = option.make_option_group(option.batch_build_group, self.parser)
+        self.parser.option_groups.insert(0, build_opts)
+
+    def _run_single(self, options, args):
         gradle_build = GradleBuild(options, options.verbose)
         with gradle_build.prepare(AndroidManifest()):
             if gradle_build.build():
@@ -120,11 +187,13 @@ class GradleCommand(Command):
 
 
 commands = {
-    AndBuildCommand.name: AndBuildCommand,
-    GradleCommand.name: GradleCommand
+    AntCommand.name: AntCommand,
+    GradleCommand.name: GradleCommand,
+    AntBatchCommand.name: AntBatchCommand,
+    GradleBatchCommand.name: GradleBatchCommand
 }
 
-commands_order = [AndBuildCommand, GradleCommand]
+commands_order = [AntCommand, GradleCommand, AntBatchCommand, GradleBatchCommand]
 
 
 def get_summaries(ignore_hidden=True, ordered=True):
