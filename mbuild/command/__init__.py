@@ -8,6 +8,8 @@ import optparse
 from mbuild import option
 from mbuild.util import get_git_commit_sha1
 from mbuild.util import get_prog
+from mbuild.util import scp_send_apk
+
 from mbuild.parser import PrettyHelpFormatter
 from mbuild.androidmanifest import AndroidManifest
 
@@ -61,6 +63,10 @@ class Command(object):
         exit = SUCCESS
         try:
             status = self.run(options, args)
+
+            # transfer apk to wlan
+            self._scp_send_apk(options)
+
             if isinstance(status, int):
                 exit = status
         except CommandError:
@@ -75,6 +81,17 @@ class Command(object):
                     setattr(options, key, unicode(value, 'gb2312'))
                 except UnicodeDecodeError as e:
                     print '%-20s = %-10s, %s' % (key, value, type(value))
+
+    def _scp_send_apk(self, options):
+        is_transfer = os.getenv('isTransfer2Wlan', False)
+        if (isinstance(is_transfer, str) and is_transfer.lower() == 'true') or is_transfer:
+            publish_dir_root     = os.getenv('publishRootDir', '/data/hudson/misc/release')
+            publish_build_number = os.getenv('BUILD_NUMBER', 'dev')
+            publish_dir_prefix   = os.getenv('publishDirPrefix', os.path.basename(options.branch_name))
+            publish_full_path    = '%s/%s-%s_%s' % (publish_dir_root, publish_dir_prefix, options.version_name, publish_build_number)
+
+            pkey_filename = os.getenv('WLAN_PRIVATE_KEY')
+            scp_send_apk(options.mode, publish_full_path, '42.62.42.75', 'hudson', pkey_filename=pkey_filename)
 
 class BatchCommand(Command):
 
@@ -104,7 +121,6 @@ class BatchCommand(Command):
         pass
 
 
-
 class AntCommand(Command):
     name = 'ant'
     usage = """
@@ -126,6 +142,7 @@ class AntCommand(Command):
         with ant_build.prepare(AndroidManifest()):
             if ant_build.build():
                 ant_build.publish()
+
 
 class AntBatchCommand(BatchCommand):
     name = 'ant-batch'
@@ -165,6 +182,7 @@ class GradleCommand(Command):
         with gradle_build.prepare(AndroidManifest()):
             if gradle_build.build():
                 gradle_build.publish()
+
 
 class GradleBatchCommand(BatchCommand):
     name = 'gradle-batch'
