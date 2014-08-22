@@ -8,6 +8,9 @@ import shutil
 import re
 import subprocess
 
+from contextlib import closing
+from paramiko import SSHClient, RSAKey, AutoAddPolicy, Transport, config
+from scpclient import Write
 from pyjavaproperties import Properties
 
 try:
@@ -191,3 +194,32 @@ def get_terminal_size():
     if not cr:
         cr = (os.environ.get('LINES', 25), os.environ.get('COLUMNS', 80))
     return int(cr[1]), int(cr[0])
+
+def get_ssh_client(hostname, username, port=config.SSH_PORT,
+                   password=None, pkey_filename=None, pkey=None):
+    ssh = SSHClient()
+    ssh.set_missing_host_key_policy(AutoAddPolicy())
+    ssh.connect(hostname, port, username, password=password,
+                key_filename=pkey_filename,
+                pkey=pkey)
+    return ssh
+
+def scp_send_apk(localdir, remotedir,
+             hostname, username, port=config.SSH_PORT,
+             password=None, pkey_filename=None, pkey=None):
+    def progress(remote_filename, size, file_pos):
+        if file_pos == size:
+            print '[%s:%s] Upload %s to %s complete' % (hostname, port, remote_filename, remotedir)
+
+    ssh = get_ssh_client(hostname, username, port, password, pkey_filename, pkey)
+    try:
+        ssh.exec_command('rm -fr %s' % remotedir)
+        ssh.exec_command('mkdir -p %s' % remotedir)
+
+        with closing(Write(ssh.get_transport(), remotedir)) as scp:
+            for root, dirs, files in os.walk(localdir):
+                for file in files:
+                    if file.endswith('.apk'):
+                        scp.send_file(os.path.join(root, file), progress=progress)
+    finally:
+        ssh.close()
