@@ -83,8 +83,8 @@ class Command(object):
                     print '%-20s = %-10s, %s' % (key, value, type(value))
 
     def _scp_send_apk(self, options):
-        is_transfer = os.getenv('isTransfer2Wlan', False)
-        if (isinstance(is_transfer, str) and is_transfer.lower() == 'true') or is_transfer:
+        is_transfer = os.getenv('isTransfer2Wlan', 'false')
+        if is_transfer.lower() == 'true':
             publish_dir_root     = os.getenv('publishRootDir', '/data/hudson/misc/release')
             publish_build_number = os.getenv('BUILD_NUMBER', 'dev')
             publish_dir_prefix   = os.getenv('publishDirPrefix', os.path.basename(options.branch_name))
