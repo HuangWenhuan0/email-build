@@ -233,6 +233,8 @@ def scp_send_file(localfilepath, remotedir,
 
     ssh = get_ssh_client(hostname, username, port, password, pkey_filename, pkey)
     try:
+        r_cmd = 'rm -fr %s' % os.path.join(remotedir, os.path.basename(localfilepath))
+        ssh.exec_command(r_cmd)
 
         with closing(Write(ssh.get_transport(), remotedir)) as scp:
             scp.send_file(localfilepath, progress=progress)
