@@ -141,6 +141,9 @@ class Build(object):
                 for dir in self.SRC_DIRS:
                     tar.add(dir, exclude=exclude)
 
+        options.apk_path = os.path.join(os.getcwd(), dst_apk)
+
+
     def _get_original_apk_path(self):
         pass
 

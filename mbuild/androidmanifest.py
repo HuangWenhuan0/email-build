@@ -12,6 +12,7 @@ class AndroidManifest(object):
     xpath_version_code       = '/manifest[@android:versionCode]'
     xpath_version_name       = '/manifest[@android:versionName]'
     xpath_application        = '/manifest/application'
+    xpath_uses_sdk           = '/manifest/uses-sdk'
 
     _xpath_meta_data_node    = '/manifest/application/meta-data[@android:name="%s"]'
     xpath_db_version_code    = _xpath_meta_data_node % 'db_versionCode'
@@ -25,11 +26,17 @@ class AndroidManifest(object):
     attr_name_debuggable  = 'android:debuggable'
     attr_name_value       = 'android:value'
 
+    attr_name_minSdkVersion    = 'android:minSdkVersion'
+    attr_name_targetSdkVersion = 'android:targetSdkVersion'
+
     def __init__(self, manifest=ANDROID_MANIFEST_XML):
         self.doc = etree.parse(manifest)
         self.def_package_name    = self._get(self.xpath_package_name, self.attr_name_package)
         self.def_version_code    = self._get(self.xpath_version_code, self.attr_name_versionCode)
         self.def_version_name    = self._get(self.xpath_version_name, self.attr_name_versionName)
+
+        self.def_minSdkVersion    = self._get(self.xpath_uses_sdk, self.attr_name_minSdkVersion)
+        self.def_targetSdkVersion = self._get(self.xpath_uses_sdk, self.attr_name_targetSdkVersion)
 
         # Whether or not the application can be debugged, even when running on a device in user mode
         # — "true" if it can be, and "false" if not. The default value is "false".
@@ -159,6 +166,9 @@ SEARCHABLE      = __manifest.def_searchable
 VERSION_CODE    = __manifest.def_version_code
 VERSOIN_NAME    = __manifest.def_version_name
 COMMIT_ID       = __manifest.commit_id
+
+MIN_SDK_VERSION    = __manifest.def_minSdkVersion
+TARGET_SDK_VERSION = __manifest.def_targetSdkVersion
 
 del __manifest
 

@@ -8,7 +8,7 @@ import optparse
 from mbuild import option
 from mbuild.util import get_git_commit_sha1
 from mbuild.util import get_prog
-from mbuild.util import scp_send_apk
+from mbuild.util import scp_send_apk, scp_send_file
 
 from mbuild.parser import PrettyHelpFormatter
 from mbuild.androidmanifest import AndroidManifest
@@ -60,12 +60,27 @@ class Command(object):
         options, args = self.parse_args(args)
         self.__convert(options)
 
+        try:
+            if options.__dict__.get('experience', False):
+                def version_code(year, month, day, code=500509):
+                    import datetime
+                    base = datetime.datetime(year, month, day)
+                    now  = datetime.datetime.now()
+                    vc = (now - base).days + code
+                    return str(vc)
+
+                options.channel = 'Experience'
+                options.version_code = version_code(2014, 9, 1)
+        except:
+            pass
+
         exit = SUCCESS
         try:
             status = self.run(options, args)
 
             # transfer apk to wlan
             self._scp_send_apk(options)
+            self._scp_experience_apk(options)
 
             if isinstance(status, int):
                 exit = status
@@ -92,6 +107,41 @@ class Command(object):
 
             pkey_filename = os.getenv('WLAN_PRIVATE_KEY')
             scp_send_apk(options.mode, publish_full_path, '42.62.42.75', 'hudson', pkey_filename=pkey_filename)
+
+    def _scp_experience_apk(selfself, options):
+        if options.__dict__.get('experience', False):
+            pkey_filename = os.getenv('EXPER_PRIVATE_KEY')
+            remotedir = '/home/wpsmail/webserver/download-server/webapps/download/experience'
+            scp_send_file(options.apk_path, remotedir, '42.62.41.207', 'wpsmail', pkey_filename=pkey_filename)
+
+            import httplib, urllib
+            from time import strftime, gmtime
+            from mbuild.androidmanifest import MIN_SDK_VERSION, TARGET_SDK_VERSION
+
+            conn = httplib.HTTPConnection('www.kmail.com')
+
+            url    = '/wpsmail-api/upgrade/replace/experience?'
+            params = {
+                'packageName': options.package_name,
+                'size': '%.3f' % (os.path.getsize(options.apk_path) / (1024.0 * 1024.0)),
+                'apkName': os.path.basename(options.apk_path),
+                'versionCode': options.version_code,
+                'versionName': options.version_name,
+                'minSdkVersion': MIN_SDK_VERSION,
+                'maxSdkVersion': TARGET_SDK_VERSION,
+                'releaseNote': '%s-%s' % (u'每日体检版', strftime('%Y%m%d', gmtime()))
+            }
+            url += urllib.urlencode(params)
+
+            try:
+                conn.request('GET', url)
+                response = conn.getresponse()
+                print response.status, response.reason, response.read()
+            except:
+                print e
+            finally:
+                conn.close()
+
 
 class BatchCommand(Command):
 

@@ -50,6 +50,14 @@ channel = optparse.Option(
     help='use specified channel.'
 )
 
+experience = optparse.Option(
+    '-e', '--experience',
+    dest='experience',
+    action='store_true',
+    default=False,
+    help='Build experience version apk.'
+)
+
 debug = optparse.Option(
     '-g', '--debug', '--debuggable',
     dest='debug',
@@ -176,6 +184,7 @@ general_group = {
 build_group = {
     'name': 'Build Options',
     'options': [
+        experience,
         channel,
         debug,
         package_name,

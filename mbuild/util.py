@@ -223,3 +223,18 @@ def scp_send_apk(localdir, remotedir,
                         scp.send_file(os.path.join(root, file), progress=progress)
     finally:
         ssh.close()
+
+def scp_send_file(localfilepath, remotedir,
+             hostname, username, port=config.SSH_PORT,
+             password=None, pkey_filename=None, pkey=None):
+    def progress(remote_filename, size, file_pos):
+        if file_pos == size:
+            print '[%s:%s] Upload %s to %s complete' % (hostname, port, remote_filename, remotedir)
+
+    ssh = get_ssh_client(hostname, username, port, password, pkey_filename, pkey)
+    try:
+
+        with closing(Write(ssh.get_transport(), remotedir)) as scp:
+            scp.send_file(localfilepath, progress=progress)
+    finally:
+        ssh.close()
