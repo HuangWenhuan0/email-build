@@ -69,7 +69,11 @@ class Command(object):
                     vc = (now - base).days + code
                     return str(vc)
 
+                from time import strftime, gmtime
+
                 options.channel = 'Experience'
+                options.version_name = '%s_%s_%s' % (
+                'WpsMail_Experience', strftime('%Y%m%d', gmtime()), os.getenv('BUILD_NUMBER', '8888'))
                 options.version_code = version_code(2014, 9, 1)
         except:
             pass
@@ -105,14 +109,44 @@ class Command(object):
             publish_dir_prefix   = os.getenv('publishDirPrefix', os.path.basename(options.branch_name))
             publish_full_path    = '%s/%s-%s_%s' % (publish_dir_root, publish_dir_prefix, options.version_name, publish_build_number)
 
+            # Linux上，最后一个包上传后格式被损坏了（文件内容没有完整）
+            # pkey_filename = os.getenv('WLAN_PRIVATE_KEY')
+            # scp_send_apk(options.mode, publish_full_path, '42.62.42.75', 'hudson', pkey_filename=pkey_filename)
+
             pkey_filename = os.getenv('WLAN_PRIVATE_KEY')
-            scp_send_apk(options.mode, publish_full_path, '42.62.42.75', 'hudson', pkey_filename=pkey_filename)
+            host = 'hudson@42.62.42.75'
+
+            ssh_cmd = 'ssh -o StrictHostKeyChecking=no -i %s %s "%s"' % (pkey_filename, host, 'rm -fr %s; mkdir -p %s' % (publish_full_path, publish_full_path))
+            r = os.system(ssh_cmd)
+            print ssh_cmd, r == 0
+
+            for root, dirs, files in os.walk(options.mode):
+                for file in files:
+                    if file.endswith('.apk'):
+                        scp_cmd = 'scp -o StrictHostKeyChecking=no -i %s %s %s:%s' % (pkey_filename, os.path.join(root, file), host, publish_full_path)
+                        r = os.system(scp_cmd)
+                        print scp_cmd, r == 0
 
     def _scp_experience_apk(selfself, options):
         if options.__dict__.get('experience', False):
-            pkey_filename = os.getenv('EXPER_PRIVATE_KEY')
+            # Linux上，最后一个包上传后格式被损坏了（文件内容没有完整）
+            # pkey_filename = os.getenv('EXPER_PRIVATE_KEY')
+            # remotedir = '/home/wpsmail/webserver/download-server/webapps/download/experience'
+            # scp_send_file(options.apk_path, remotedir, '42.62.41.207', 'wpsmail', pkey_filename=pkey_filename)
+
             remotedir = '/home/wpsmail/webserver/download-server/webapps/download/experience'
-            scp_send_file(options.apk_path, remotedir, '42.62.41.207', 'wpsmail', pkey_filename=pkey_filename)
+            apk_path = options.apk_path
+            apk_name = os.path.basename(apk_path)
+            pkey_filename = os.getenv('EXPER_PRIVATE_KEY')
+            host = 'wpsmail@42.62.41.207'
+
+            ssh_cmd = 'ssh -o StrictHostKeyChecking=no -i %s %s "%s"' % (pkey_filename, host, 'rm -fr %s' % os.path.join(remotedir, apk_name))
+            r = os.system(ssh_cmd)
+            print ssh_cmd, r == 0
+
+            scp_cmd = 'scp -o StrictHostKeyChecking=no -i %s %s %s:%s' % (pkey_filename, apk_path, host, remotedir)
+            r = os.system(scp_cmd)
+            print scp_cmd, r == 0
 
             import httplib, urllib
             from time import strftime, gmtime
@@ -137,7 +171,7 @@ class Command(object):
                 conn.request('GET', url)
                 response = conn.getresponse()
                 print response.status, response.reason, response.read()
-            except:
+            except Exception, e:
                 print e
             finally:
                 conn.close()
