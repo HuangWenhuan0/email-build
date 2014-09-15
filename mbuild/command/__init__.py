@@ -69,11 +69,11 @@ class Command(object):
                     vc = (now - base).days + code
                     return str(vc)
 
-                from time import strftime, gmtime
+                from time import strftime, localtime
 
                 options.channel = 'Experience'
                 options.version_name = '%s_%s_%s' % (
-                'WpsMail_Experience', strftime('%Y%m%d', gmtime()), os.getenv('BUILD_NUMBER', '8888'))
+                'WpsMail_Experience', strftime('%Y%m%d', localtime()), os.getenv('BUILD_NUMBER', '8888'))
                 options.version_code = version_code(2014, 9, 1)
         except:
             pass
@@ -149,7 +149,7 @@ class Command(object):
             print scp_cmd, r == 0
 
             import httplib, urllib
-            from time import strftime, gmtime
+            from time import strftime, localtime
             from mbuild.androidmanifest import MIN_SDK_VERSION, TARGET_SDK_VERSION
 
             conn = httplib.HTTPConnection('www.kmail.com')
@@ -163,7 +163,7 @@ class Command(object):
                 'versionName': options.version_name,
                 'minSdkVersion': MIN_SDK_VERSION,
                 'maxSdkVersion': TARGET_SDK_VERSION,
-                'releaseNote': '%s-%s' % (u'每日体检版', strftime('%Y%m%d', gmtime()))
+                'releaseNote': '%s-%s' % (u'每日体检版', strftime('%Y%m%d', localtime()))
             }
             url += urllib.urlencode(params)
 
