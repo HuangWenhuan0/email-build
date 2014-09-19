@@ -8,6 +8,8 @@ NAMESPACES           = {'android' : 'http://schemas.android.com/apk/res/android'
 
 class AndroidManifest(object):
 
+    DEFAULT = 'DEFAULT'
+
     xpath_package_name       = '/manifest[@package]'
     xpath_version_code       = '/manifest[@android:versionCode]'
     xpath_version_name       = '/manifest[@android:versionName]'
@@ -103,11 +105,11 @@ class AndroidManifest(object):
                 os.system(scmd_app_np % (self.def_package_name, package_name, file))
 
     def set_version_code(self, version_code):
-        if version_code is not None and version_code != self.def_version_code:
+        if version_code is not None and version_code != self.DEFAULT and version_code != self.def_version_code:
             self.set(self.xpath_version_code, self.attr_name_versionCode, version_code)
 
     def set_version_name(self, version_name):
-        if version_name is not None and version_name != self.def_version_name:
+        if version_name is not None and version_name != self.DEFAULT and version_name != self.def_version_name:
             self.set(self.xpath_version_name, self.attr_name_versionName, version_name)
 
     def set_debuggable(self, debuggable):
