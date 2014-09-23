@@ -1,7 +1,9 @@
 #BuildApk Usage：
 
 1、python makezip.py - [create mbuild.zip in output directory]
+
 2、copy mbuild.zip to ../AndroidMail project directory
+
 3、python mbuild.zip - [print help information]
 	
 	Usage:   
@@ -22,6 +24,7 @@
 								http://42.62.42.75:51866/build-conf2/)
 
 4、python mbuild.zip ant         - [ant build]
+
 5、python mbuild.zip gradle      - [gradle build]
 	Parameter List：
 		Build Options:
@@ -70,6 +73,7 @@
 	
 
 6、python mbuild.zip ant-batch       - [ant batch build]
+
 7、python mbuild.zip gradle-batch    - [gradle batch build]
 	
 	与单包构建相比，只有一个参数不同-C, --batch-channel
