@@ -245,7 +245,6 @@ class Build(object):
         manifest.set_channel(options.channel)
         manifest.set_commit_id(options.commit_id)
         manifest.set_debuggable(options.debug)
-        manifest.set_db_version_code(options.db_version_code)
         manifest.save()
 
     def _revise_other_file(self):
@@ -297,7 +296,8 @@ class Build(object):
             except:
                 value = format
 
-            apk_name = apk_name.replace(format, value)
+            if value is not None:
+                apk_name = apk_name.replace(format, value)
 
         return apk_name if apk_name.endswith('.apk') else apk_name + '.apk'
 

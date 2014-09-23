@@ -17,7 +17,6 @@ class AndroidManifest(object):
     xpath_uses_sdk           = '/manifest/uses-sdk'
 
     _xpath_meta_data_node    = '/manifest/application/meta-data[@android:name="%s"]'
-    xpath_db_version_code    = _xpath_meta_data_node % 'db_versionCode'
     xpath_channel            = _xpath_meta_data_node % 'channel'
     xpath_default_searchable = _xpath_meta_data_node % 'android.app.default_searchable'
     xpath_commit_id          = _xpath_meta_data_node % 'commit_id'
@@ -45,7 +44,6 @@ class AndroidManifest(object):
         self.def_debuggable      = self._get(self.xpath_application, self.attr_name_debuggable)
         self.def_debuggable      = 'false' if self.def_debuggable is None else 'true'
 
-        self.def_db_version_code = self._get(self.xpath_db_version_code, self.attr_name_value)
         self.def_channel         = self._get(self.xpath_channel, self.attr_name_value)
         self.def_searchable      = self._get(self.xpath_default_searchable, self.attr_name_value)
         self.commit_id           = self._get(self.xpath_commit_id, self.attr_name_value)
@@ -116,13 +114,6 @@ class AndroidManifest(object):
         if debuggable is not None and debuggable != self.def_debuggable:
             self.set(self.xpath_application, self.attr_name_debuggable, str(debuggable).lower())
 
-    def set_db_version_code(self, db_version_code):
-        if db_version_code is not None and db_version_code != self.def_db_version_code:
-            import types
-            if type(db_version_code) is types.IntType:
-                db_version_code = str(db_version_code)
-            self.set(self.xpath_db_version_code, self.attr_name_value, db_version_code)
-
     def set_channel(self, channel):
         if channel is not None and channel != self.def_channel:
             self.set(self.xpath_channel, self.attr_name_value, channel)
@@ -161,7 +152,6 @@ class AndroidManifest(object):
 __manifest      = AndroidManifest()
 
 APK_CHANNEL     = __manifest.def_channel
-DB_VERSION_CODE = __manifest.def_db_version_code
 DEBUG           = True if __manifest.def_debuggable == 'true' else False
 PACKAGE_NAME    = __manifest.def_package_name
 SEARCHABLE      = __manifest.def_searchable

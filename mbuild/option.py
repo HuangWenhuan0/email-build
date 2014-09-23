@@ -109,15 +109,6 @@ version_code = optparse.Option(
     help='specify app version code (android:versionCode="").'
 )
 
-db_version_code = optparse.Option(
-    '--db-version-code',
-    dest='db_version_code',
-    type='str',
-    default=__amft.DB_VERSION_CODE,
-    metavar='version code',
-    help='specify app dbVersionCode (<meta-data android:name="db_versionCode", android:value="").'
-)
-
 branch_name = optparse.Option(
     '--branch-name',
     dest='branch_name',
@@ -193,7 +184,6 @@ build_group = {
         apk_display_name,
         version_name,
         version_code,
-        db_version_code,
         apk_prefix,
         hash_types,
         apk_name_format
@@ -211,7 +201,6 @@ batch_build_group = {
         apk_display_name,
         version_name,
         version_code,
-        db_version_code,
         apk_prefix,
         hash_types,
         apk_name_format
