@@ -26,6 +26,7 @@
 4、python mbuild.zip ant         - [ant build]
 
 5、python mbuild.zip gradle      - [gradle build]
+
 	Parameter List：
 		Build Options:
 		  -c, --channel <channel>     use specified channel.
