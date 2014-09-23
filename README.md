@@ -1,8 +1,8 @@
 #BuildApk Usage：
 
-## 1、python makezip.py - [create mbuild.zip in output directory]
-## 2、copy mbuild.zip to ../AndroidMail project directory
-## 3、python mbuild.zip - [print help information]
+1、python makezip.py - [create mbuild.zip in output directory]
+2、copy mbuild.zip to ../AndroidMail project directory
+3、python mbuild.zip - [print help information]
 	
 	Usage:   
 	  mbuild <command> [options]
@@ -21,8 +21,8 @@
 	  -d, --download-url <url>  Base URL of Build Configuration (default
 								http://42.62.42.75:51866/build-conf2/)
 
-## 4、python mbuild.zip ant         - [ant build]
-## 5、python mbuild.zip gradle      - [gradle build]
+4、python mbuild.zip ant         - [ant build]
+5、python mbuild.zip gradle      - [gradle build]
 	Parameter List：
 		Build Options:
 		  -c, --channel <channel>     use specified channel.
@@ -69,8 +69,8 @@
 									  http://42.62.42.75:51866/build-conf2/)
 	
 
-## 6、python mbuild.zip ant-batch       - [ant batch build]
-## 7、python mbuild.zip gradle-batch    - [gradle batch build]
+6、python mbuild.zip ant-batch       - [ant batch build]
+7、python mbuild.zip gradle-batch    - [gradle batch build]
 	
 	与单包构建相比，只有一个参数不同-C, --batch-channel
 	该参数控制指定APP的渠道号[<meta-data android:name="channel" android:value="渠道号" />]
