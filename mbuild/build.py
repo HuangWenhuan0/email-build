@@ -229,15 +229,7 @@ class Build(object):
         if not isinstance(manifest, AndroidManifest):
             raise TypeError, 'not an AndroidManifest instance: %r' % manifest
 
-        def _filter(options):
-            from mbuild import androidmanifest as __amft
-            if (options.version_code == AndroidManifest.DEFAULT):
-                options.version_code = __amft.VERSION_CODE
-            if (options.version_name == AndroidManifest.DEFAULT):
-                options.version_name = __amft.VERSOIN_NAME
-            return options
-
-        options = _filter(self.options)
+        options = self.options
 
         manifest.set_package_name(options.package_name)
         manifest.set_version_code(options.version_code)

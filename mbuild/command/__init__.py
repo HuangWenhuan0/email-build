@@ -58,8 +58,42 @@ class Command(object):
 
     def main(self, args):
         options, args = self.parse_args(args)
-        self.__convert(options)
+        self._unicode_convert(options)
+        self._filter(options)
+        self._experience_filter(options)
 
+        exit = SUCCESS
+        try:
+            status = self.run(options, args)
+
+            # transfer apk to wlan
+            self._scp_send_apk(options)
+            self._scp_experience_apk(options)
+
+            if isinstance(status, int):
+                exit = status
+        except CommandError:
+            e = sys.exc_info()[1]
+            exit = ERROR
+        return exit
+
+    def _unicode_convert(self, options):
+        for key, value in options.__dict__.items():
+            if type(value) is str and not isinstance(value, unicode):
+                try:
+                    setattr(options, key, unicode(value, 'gb2312'))
+                except UnicodeDecodeError as e:
+                    print '%-20s = %-10s, %s' % (key, value, type(value))
+
+    def _filter(self, options):
+        from mbuild import androidmanifest as __amft
+        if (options.version_code == AndroidManifest.DEFAULT):
+            options.version_code = __amft.VERSION_CODE
+        if (options.version_name == AndroidManifest.DEFAULT):
+            options.version_name = __amft.VERSOIN_NAME
+        return options
+
+    def _experience_filter(self, options):
         try:
             if options.__dict__.get('experience', False):
                 def version_code(year, month, day, code=500509):
@@ -77,29 +111,6 @@ class Command(object):
                 options.version_code = version_code(2014, 9, 1)
         except:
             pass
-
-        exit = SUCCESS
-        try:
-            status = self.run(options, args)
-
-            # transfer apk to wlan
-            self._scp_send_apk(options)
-            self._scp_experience_apk(options)
-
-            if isinstance(status, int):
-                exit = status
-        except CommandError:
-            e = sys.exc_info()[1]
-            exit = ERROR
-        return exit
-
-    def __convert(self, options):
-        for key, value in options.__dict__.items():
-            if type(value) is str and not isinstance(value, unicode):
-                try:
-                    setattr(options, key, unicode(value, 'gb2312'))
-                except UnicodeDecodeError as e:
-                    print '%-20s = %-10s, %s' % (key, value, type(value))
 
     def _scp_send_apk(self, options):
         is_transfer = os.getenv('isTransfer2Wlan', 'false')
