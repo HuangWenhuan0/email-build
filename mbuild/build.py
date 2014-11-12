@@ -13,6 +13,7 @@ import logging
 import re
 import base64
 import hashlib
+import copy
 
 from mbuild.util import is_mi_branch
 from mbuild.util import rename
@@ -133,6 +134,9 @@ class Build(object):
                 from mbuild.util import log
                 log(self.options, build_log_fobj)
 
+            # publish apk and build info
+            self.cp_autotest_res(apk_name)
+
         # make src compress file
         if os.getenv('publish_src'):
             archive_name = '%s/src.tar.gz' % os.path.curdir
@@ -156,6 +160,42 @@ class Build(object):
             for dir in self.TEMP_DIRS:
                 if _exists(dir):
                     shutil.rmtree(dir)
+
+    def cp_autotest_res(self, apk_name):
+        tmp_options = copy.deepcopy(self.options)
+        if tmp_options.test_flag:
+            # publish test apk and build info
+            tmp_options.build_number = os.environ['BUILD_NUMBER']
+            tmp_options.build_time = os.environ['BUILD_ID']
+            tmp_options.apk_name = apk_name
+
+            t_apk_pdir = tmp_options.test_apk_publish_dir
+            t_info_pdir = tmp_options.test_info_publish_dir
+
+            with open('build-info', 'w') as build_log_fobj:
+                from mbuild.util import log
+                try:
+                    del tmp_options.help
+                    del tmp_options.hash_types
+                    del tmp_options.test_info_publish_dir
+                    del tmp_options.test_apk_publish_dir
+                    del tmp_options.test_flag
+                    del tmp_options.display_name
+                    del tmp_options.apk_name_format
+                    del tmp_options.verbose
+                    del tmp_options.download_url
+                    del tmp_options.enable_branch_name
+                except:
+                    pass
+                log(tmp_options, build_log_fobj)
+
+            if not os.path.exists(t_apk_pdir):
+                os.makedirs(t_apk_pdir)
+            if not os.path.exists(t_info_pdir):
+                os.makedirs(t_info_pdir)
+
+            shutil.copy2(apk_name, t_apk_pdir)
+            shutil.copy2('build-info', t_info_pdir)
 
     def backup(self):
         """

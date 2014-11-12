@@ -162,6 +162,32 @@ hash_types = optparse.Option(
     help='apk hash algorithms list (default "%default")'
 )
 
+test_flag = optparse.Option(
+    '-t', '--test',
+    dest='test_flag',
+    action='store_true',
+    default=False,
+    help='publish apk and build info (False is default value).'
+)
+
+test_apk_publish_dir = optparse.Option(
+    '--test-apk-publish-dir',
+    dest='test_apk_publish_dir',
+    type='str',
+    default='/tmp',
+    metavar='automate apk and other info directory',
+    help='automate apk and other info directory (default "%default")'
+)
+
+test_info_publish_dir = optparse.Option(
+    '--test-info-publish-dir',
+    dest='test_info_publish_dir',
+    type='str',
+    default='/tmp',
+    metavar='automate build info directory',
+    help='automate build info directory (default "%default")'
+)
+
 general_group = {
     'name': 'General Options',
     'options': [
@@ -186,7 +212,10 @@ build_group = {
         version_code,
         apk_prefix,
         hash_types,
-        apk_name_format
+        apk_name_format,
+        test_flag,
+        test_apk_publish_dir,
+        test_info_publish_dir
         ]
     }
 
