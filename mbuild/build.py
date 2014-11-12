@@ -163,7 +163,8 @@ class Build(object):
 
     def cp_autotest_res(self, apk_name):
         tmp_options = copy.deepcopy(self.options)
-        if tmp_options.test_flag:
+        # Fix AttributeError: Values instance has no attribute 'test_flag'
+        if tmp_options.__dict__.get('test_flag', False):
             # publish test apk and build info
             tmp_options.build_number = os.environ['BUILD_NUMBER']
             tmp_options.build_time = os.environ['BUILD_ID']
@@ -187,7 +188,8 @@ class Build(object):
                     del tmp_options.enable_branch_name
                 except:
                     pass
-                log(tmp_options, build_log_fobj)
+                finally:
+                    log(tmp_options, build_log_fobj)
 
             if not os.path.exists(t_apk_pdir):
                 os.makedirs(t_apk_pdir)
