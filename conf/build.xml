@@ -107,7 +107,10 @@
                 <property name="out.unaligned.file" location="${out.absolute.dir}/${ant.project.name}-debug-unaligned.apk" />
                 <!-- Signs the APK -->
                 <echo level="info">Signing final apk...</echo>
+                <!--Fix Installation error: INSTALL_PARSE_FAILED_NO_CERTIFICATES -->
                 <signjar
+                        sigalg="MD5withRSA"
+                        digestalg="SHA1"
                         jar="${out.packaged.file}"
                         signedjar="${out.unaligned.file}"
                         keystore="${key.store}"

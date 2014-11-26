@@ -285,7 +285,8 @@ class Build(object):
         # rename files
         files = {
             'ksMailTemplate_mixed.html': 'ksMailTemplate.html',
-            'ksMailView_mixed.js': 'ksMailView.js'
+            'ksMailView_mixed.js': 'ksMailView.js',
+            'ksTransHref_mixed.js': 'ksTransHref.js'
         }
         rename('assets', **files)
 
