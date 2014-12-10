@@ -386,7 +386,7 @@ class AntBuild(Build):
                 if member.isfile():
                     path, name = os.path.dirname(member.name), os.path.basename(member.name)
 
-                    if self.ismi and path ==self.WPS_PACKAGE_NAME: continue
+                    if self.ismi and path == self.WPS_PACKAGE_NAME: continue
                     if not self.ismi and path == self.MI_PACKAGE_NAME: continue
 
                     tar.makefile(member, targetpath=name)
