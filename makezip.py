@@ -28,4 +28,4 @@ def zip(target, *paths):
             __addToZip(zipfile, path, os.path.basename(path))
 
 if __name__ == '__main__':
-    zip('output/mbuild', '__main__.py', 'mbuild')
+    zip('lv/mbuild', '__main__.py', 'mbuild')

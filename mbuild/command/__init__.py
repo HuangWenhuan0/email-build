@@ -289,9 +289,6 @@ class GradleBatchCommand(BatchCommand):
     def __init__(self):
         super(GradleBatchCommand, self).__init__()
 
-        build_opts = option.make_option_group(option.batch_build_group, self.parser)
-        self.parser.option_groups.insert(0, build_opts)
-
     def _run_single(self, options, args):
         gradle_build = GradleBuild(options, options.verbose)
         with gradle_build.prepare(AndroidManifest()):

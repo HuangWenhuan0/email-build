@@ -1,5 +1,4 @@
 .idea
 *.pyc
-output
 *.base64
 conf/ant.tar.gz
