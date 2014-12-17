@@ -187,7 +187,14 @@ test_info_publish_dir = optparse.Option(
     metavar='automate build info directory',
     help='automate build info directory (default "%default")'
 )
-
+flavor_name = optparse.Option(
+    '--flavor-name',
+    dest='flavor_name',
+    type='str',
+    default='',
+    metavar='specify which flavor to build',
+    help='specify which flavor to build (such as : kingsoft/oppo).'
+)
 general_group = {
     'name': 'General Options',
     'options': [
@@ -215,7 +222,8 @@ build_group = {
         apk_name_format,
         test_flag,
         test_apk_publish_dir,
-        test_info_publish_dir
+        test_info_publish_dir,
+        flavor_name
         ]
     }
 
@@ -232,6 +240,7 @@ batch_build_group = {
         version_code,
         apk_prefix,
         hash_types,
-        apk_name_format
+        apk_name_format,
+        flavor_name
         ]
 }

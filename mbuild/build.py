@@ -49,6 +49,7 @@ class Build(object):
 
     APK_NAME_FORMAT = {
         '%prefix':          'apk_prefix',
+        '%flavorName':     'flavor_name',
         '%channel':         'channel',
         '%versionName':     'version_name',
         '%versionCode':     'version_code',
@@ -69,6 +70,7 @@ class Build(object):
         self.channel = options.channel
         self.download_url = options.download_url
         self.mode = 'debug' if options.debug else 'release'
+        self.flavor_name = options.flavor_name
         self.hash_algorithms = ['md5', 'sha1']
 
         self.__process_branch_name(ismi)
@@ -418,7 +420,7 @@ class GradleBuild(Build):
 
     def __init__(self, options, verbose=False, ismi=is_mi_branch):
         super(GradleBuild, self).__init__(options, verbose, ismi)
-        self.task = 'assembleDebug' if options.debug else 'assembleRelease'
+        self.task = 'assemble'+options.flavor_name+'Debug' if options.debug else 'assemble' + options.flavor_name + 'Release'
 
     def build(self):
         self.cmd_line_build_file = 'gradle-build.log'
@@ -426,7 +428,10 @@ class GradleBuild(Build):
         return os.system(gradle_cmd % (self.task, self.cmd_line_build_file)) == 0
 
     def _get_original_apk_path(self):
-        src_apk_name = 'AndroidMail-%s.apk' % self.mode
+        temp_flavor = self.flavor_name if len(self.flavor_name) == 0 else (self.flavor_name+'-')
+        print "GradleBuild temp_flavor: "+temp_flavor
+
+        src_apk_name = 'AndroidMail-%s%s.apk' % (temp_flavor, self.mode)
         for root, dirs, files in os.walk('build'):
             if src_apk_name in files:
                 return os.path.join(root, src_apk_name)

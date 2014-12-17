@@ -63,7 +63,9 @@
 									  %commitId       git commit sha1
 									  %dbVersoinCode  app dbversionCode
 									  %packageName    app package name
-
+          -flavor, --flavor-name <flavor_name>
+                                      specify which flavor to build
+									  (such as : kingsoft/oppo).
 		General Options:
 		  -h, --help                  Show help.
 		  -V, --version               Show version and exit.
@@ -128,7 +130,9 @@
 									  %commitId       git commit sha1
 									  %dbVersoinCode  app dbversionCode
 									  %packageName    app package name
-
+          -flavor, --flavor-name <flavor_name>
+                                      specify which flavor to build
+									  (such as : kingsoft/oppo).
 		General Options:
 		  -h, --help                  Show help.
 		  -V, --version               Show version and exit.
