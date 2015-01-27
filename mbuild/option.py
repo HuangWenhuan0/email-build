@@ -59,11 +59,11 @@ experience = optparse.Option(
 )
 
 debug = optparse.Option(
-    '-g', '--debug', '--debuggable',
+    '--mode',
     dest='debug',
-    action='store_true',
-    default=False,
-    help='android apk is debug or release, (release is default value).'
+    type='str',
+    default='release',
+    help='android apk is debug, release, or unsigned (release is default value).'
 )
 
 package_name = optparse.Option(

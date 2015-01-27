@@ -198,7 +198,8 @@ class BatchCommand(Command):
 
     def run(self, options, args):
         options.commit_id = get_git_commit_sha1()
-        options.mode = 'debug' if options.debug else 'release'
+        #options.mode = 'debug' if options.debug else 'release'
+        options.mode = options.debug
 
         batch_channel = options.batch_channel
         del options.batch_channel
@@ -271,7 +272,8 @@ class GradleCommand(Command):
 
     def run(self, options, args):
         options.commit_id = get_git_commit_sha1()
-        options.mode = 'debug' if options.debug else 'release'
+        print 'options.debug='+options.debug
+        options.mode = options.debug
 
         gradle_build = GradleBuild(options, options.verbose)
         with gradle_build.prepare(AndroidManifest()):

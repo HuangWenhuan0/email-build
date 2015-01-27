@@ -69,7 +69,8 @@ class Build(object):
         self.commit_id = options.commit_id
         self.channel = options.channel
         self.download_url = options.download_url
-        self.mode = 'debug' if options.debug else 'release'
+        #self.mode = 'debug' if options.debug else 'release'
+        self.mode = options.debug
         self.flavor_name = options.flavor_name
         self.hash_algorithms = ['md5', 'sha1']
 
@@ -111,7 +112,6 @@ class Build(object):
         publish_dir = '%s/%s/%s' % (options.mode, options.channel, options.commit_id)
         if not os.path.exists(publish_dir):
             os.makedirs(publish_dir)
-
 
         apk_name = self._expand_apk_name(options.apk_name_format)
         src_apk = self._get_original_apk_path()
@@ -280,7 +280,7 @@ class Build(object):
         manifest.set_version_name(options.version_name)
         manifest.set_channel(options.channel)
         manifest.set_commit_id(options.commit_id)
-        manifest.set_debuggable(options.debug)
+        manifest.set_debuggable(options.debug=='debug')
         manifest.save()
 
     def _revise_other_file(self):
@@ -420,7 +420,7 @@ class GradleBuild(Build):
 
     def __init__(self, options, verbose=False, ismi=is_mi_branch):
         super(GradleBuild, self).__init__(options, verbose, ismi)
-        self.task = 'assemble'+options.flavor_name+'Debug' if options.debug else 'assemble' + options.flavor_name + 'Release'
+        self.task = 'assemble'+options.flavor_name+options.mode
 
     def build(self):
         self.cmd_line_build_file = 'gradle-build.log'
@@ -429,9 +429,11 @@ class GradleBuild(Build):
 
     def _get_original_apk_path(self):
         temp_flavor = self.flavor_name if len(self.flavor_name) == 0 else (self.flavor_name+'-')
-        print "GradleBuild temp_flavor: "+temp_flavor
 
         src_apk_name = 'AndroidMail-%s%s.apk' % (temp_flavor, self.mode)
+        src_apk_name2 = 'AndroidMail-%s%s-unsigned.apk' % (temp_flavor, self.mode)
         for root, dirs, files in os.walk('build'):
             if src_apk_name in files:
                 return os.path.join(root, src_apk_name)
+            if src_apk_name2 in files:
+                return os.path.join(root, src_apk_name2)
