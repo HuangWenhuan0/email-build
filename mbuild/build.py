@@ -371,7 +371,7 @@ class AntBuild(Build):
 
     def __init__(self, options, verbose=False, ismi=is_mi_branch):
         super(AntBuild, self).__init__(options, verbose, ismi)
-        self.task = 'debug' if options.debug else 'release'
+        self.task = options.debug
 
     def _revise_build_conf(self):
         super(AntBuild, self)._revise_build_conf()
