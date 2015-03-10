@@ -195,6 +195,16 @@ flavor_name = optparse.Option(
     metavar='specify which flavor to build',
     help='specify which flavor to build (such as : kingsoft/oppo).'
 )
+
+package_name_for_exp = optparse.Option(
+    '--package-name-for-exp',
+    dest='package_name_for_exp',
+    type='str',
+    default=None,
+    metavar='specify which package to upgrade',
+    help='Take effect only when the parameters with -e'
+         '(value default as : content in AndroidManifest.xml).'
+)
 general_group = {
     'name': 'General Options',
     'options': [
@@ -223,7 +233,8 @@ build_group = {
         test_flag,
         test_apk_publish_dir,
         test_info_publish_dir,
-        flavor_name
+        flavor_name,
+        package_name_for_exp
         ]
     }
 

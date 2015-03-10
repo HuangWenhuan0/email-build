@@ -72,6 +72,7 @@ class Build(object):
         #self.mode = 'debug' if options.debug else 'release'
         self.mode = options.debug
         self.flavor_name = options.flavor_name
+        self.package_name_for_exp = options.package_name_for_exp
         self.hash_algorithms = ['md5', 'sha1']
 
         self.__process_branch_name(ismi)
