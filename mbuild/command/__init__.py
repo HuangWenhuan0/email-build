@@ -145,7 +145,7 @@ class Command(object):
             # remotedir = '/home/wpsmail/webserver/download-server/webapps/download/experience'
             # scp_send_file(options.apk_path, remotedir, '42.62.41.207', 'wpsmail', pkey_filename=pkey_filename)
 
-            remotedir = '/home/wpsmail/webserver/download-server/webapps/download/exp'
+            remotedir = '/home/wpsmail/webserver/download-server/webapps/download/experience'
             apk_path = options.apk_path
             apk_name = os.path.basename(apk_path)
             pkey_filename = os.getenv('EXPER_PRIVATE_KEY')
