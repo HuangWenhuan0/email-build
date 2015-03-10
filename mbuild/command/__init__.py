@@ -96,7 +96,7 @@ class Command(object):
     def _experience_filter(self, options):
         try:
             if options.__dict__.get('experience', False):
-                def version_code(year, month, day, code=500509):
+                def version_code(year, month, day, code=500528):
                     import datetime
                     base = datetime.datetime(year, month, day)
                     now  = datetime.datetime.now()
@@ -105,10 +105,10 @@ class Command(object):
 
                 from time import strftime, localtime
 
-                options.channel = 'Experience'
+                options.channel = 'exp'
                 options.version_name = '%s_%s_%s' % (
-                'WpsMail_Experience', strftime('%Y%m%d', localtime()), os.getenv('BUILD_NUMBER', '8888'))
-                options.version_code = version_code(2014, 9, 1)
+                'WpsMail_Exp', strftime('%Y%m%d', localtime()), os.getenv('BUILD_NUMBER', '8888'))
+                options.version_code = version_code(2015, 3, 10)
         except:
             pass
 
@@ -145,7 +145,7 @@ class Command(object):
             # remotedir = '/home/wpsmail/webserver/download-server/webapps/download/experience'
             # scp_send_file(options.apk_path, remotedir, '42.62.41.207', 'wpsmail', pkey_filename=pkey_filename)
 
-            remotedir = '/home/wpsmail/webserver/download-server/webapps/download/experience'
+            remotedir = '/home/wpsmail/webserver/download-server/webapps/download/exp'
             apk_path = options.apk_path
             apk_name = os.path.basename(apk_path)
             pkey_filename = os.getenv('EXPER_PRIVATE_KEY')
@@ -165,18 +165,23 @@ class Command(object):
 
             conn = httplib.HTTPConnection('www.kmail.com')
 
-            url    = '/wpsmail-api/upgrade/replace/experience?'
+            url    = '/wpsmail-api/upgrade/exp/replace?'
+            des_packageName = (options.package_name
+                                if options.package_name_for_exp is None else options.package_name_for_exp);
+            print "des_packageName=%s" % des_packageName
             params = {
-                'packageName': options.package_name,
+                'packageName': (options.package_name
+                                if options.package_name_for_exp is None else options.package_name_for_exp),
                 'size': '%.3f' % (os.path.getsize(options.apk_path) / (1024.0 * 1024.0)),
                 'apkName': os.path.basename(options.apk_path),
                 'versionCode': options.version_code,
                 'versionName': options.version_name,
                 'minSdkVersion': MIN_SDK_VERSION,
                 'maxSdkVersion': TARGET_SDK_VERSION,
-                'releaseNote': '%s-%s' % (u'每日体检版', strftime('%Y%m%d', localtime()))
+                'releaseNote': '%s-%s' % (u'Wpsmail偷跑版', strftime('%Y%m%d', localtime()))
             }
             url += urllib.urlencode(params)
+            print "url=%s" % url
 
             try:
                 conn.request('GET', url)

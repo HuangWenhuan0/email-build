@@ -65,7 +65,10 @@
 									  %packageName    app package name
           -flavor, --flavor-name <flavor_name>
                                       specify which flavor to build
-									  (such as : kingsoft/oppo).
+									  (such as : kingsoft/oppo)
+          --package-name-for-exp <package_name>
+                                      specify which package to upgrade,Take effect only when the parameters with -e, 
+									  (value default as : content in AndroidManifest.xml).
 		General Options:
 		  -h, --help                  Show help.
 		  -V, --version               Show version and exit.
@@ -131,8 +134,11 @@
 									  %dbVersoinCode  app dbversionCode
 									  %packageName    app package name
           -flavor, --flavor-name <flavor_name>
-                                      specify which flavor to build
-									  (such as : kingsoft/oppo).
+                                      specify which package to upgrade for exp
+									  (such as : kingsoft/oppo)
+		  --package-name-for-exp <package_name>
+                                      specify which package to upgrade,Take effect only when the parameters with -e, 
+									  (value default as : content in AndroidManifest.xml).
 		General Options:
 		  -h, --help                  Show help.
 		  -V, --version               Show version and exit.
