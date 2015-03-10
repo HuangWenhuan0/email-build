@@ -252,6 +252,7 @@ batch_build_group = {
         apk_prefix,
         hash_types,
         apk_name_format,
-        flavor_name
+        flavor_name,
+        package_name_for_exp
         ]
 }
